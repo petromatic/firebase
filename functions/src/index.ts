@@ -6,8 +6,11 @@ admin.initializeApp(functions.config().firebase)
 // import { validateTruck } from './validateTruck';
 // export { validateTruck }
 
-// import { validateDriver } from './validateDriver';
-// export { validateDriver }
+import { validateDriver } from './validateDriver';
+export { validateDriver }
 
-import { getLimits } from './getLimits';
-export { getLimits }
+import { pushTransaction } from './pushTransaction';
+export { pushTransaction }
+
+// import { getLimits } from './getLimits';
+// export { getLimits }

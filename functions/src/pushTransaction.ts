@@ -14,21 +14,18 @@ const getUserFromRF = (rfidlr, rfidem) => {
     });
 }
 
-const getOrder = async(userId, truckId, driverId) => {
-    return await db.ref("user_orders").child(userId).child(truckId).child(driverId)
-    .orderByChild("transaction")
-    .endAt(false)
-    .once("value")
-    .then( (s) => s.val() );
+const pushToOrder = async(userId, truckId, driverId, orderId, value) => {
+    return await db.ref("user_orders").child(userId).child(truckId).child(driverId).child(orderId).child("transaction")
+    .push({"value": value, "timestamp":{".sv": "timestamp"}});
 }
 
-app.get('/:rfidlr/:rfidem', (req, res) => {
+app.get('/:rfidlr/:rfidem/:orderId/:value', (req, res) => {
     getUserFromRF(req.params.rfidlr, req.params.rfidem)
         .then( async(id:{user:string, truck:string, driver:string}) =>{
-            const order = await getOrder(id.user, id.truck, id.driver);
-            res.send(JSON.stringify({...id, order: order}));
+            const ret = await pushToOrder(id.user, id.truck, id.driver, req.params.orderId, req.params.value);
+            res.send(JSON.stringify({ret}));
         });
 });
 
 
-export const validateDriver = functions.https.onRequest(app);
+export const pushTransaction = functions.https.onRequest(app);
