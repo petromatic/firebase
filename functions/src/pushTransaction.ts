@@ -15,8 +15,12 @@ const getUserFromRF = (rfidlr, rfidem) => {
 }
 
 const pushToOrder = async(userId, truckId, driverId, orderId, value) => {
-    return await db.ref("user_orders").child(userId).child(truckId).child(driverId).child(orderId).child("transaction")
-    .push({"value": value, "timestamp":{".sv": "timestamp"}});
+    let transaction =  {"value": value, "timestamp":{".sv": "timestamp"}};
+    let updates = {};
+    let key = db.ref(`/user_orders/${this.userId}`).push(undefined).key;
+    updates[`${truckId}/${driverId}/${orderId}/transaction/${key}`] = transaction;
+    updates[`orders/${orderId}/transaction/${key}`] = transaction;
+    return await db.ref("user_orders").child(userId).update(updates);
 }
 
 app.get('/:rfidlr/:rfidem/:orderId/:value', (req, res) => {
