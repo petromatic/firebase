@@ -22,11 +22,25 @@ const getOrder = async(userId, truckId, driverId) => {
     .then( (s) => s.val() );
 }
 
+const getDriver = async(userId, driverId) => {
+    return await db.ref("user_drivers").child(userId).child(driverId)
+    .once("value")
+    .then( (s) => s.val() );
+}
+
+const getTruck = async(userId, truckId) => {
+    return await db.ref("user_trucks").child(userId).child(truckId)
+    .once("value")
+    .then( (s) => s.val() );
+}
+
 app.get('/:rfidlr/:rfidem', (req, res) => {
     getUserFromRF(req.params.rfidlr, req.params.rfidem)
         .then( async(id:{user:string, truck:string, driver:string}) =>{
             const order = await getOrder(id.user, id.truck, id.driver);
-            res.send(JSON.stringify({...id, order: order}));
+            const driver = await getDriver(id.user, id.driver);
+            const truck = await getTruck(id.user, id.truck);
+            res.send(JSON.stringify({...id, order: order, driver_data: driver, truck_data: truck}));
         });
 });
 
